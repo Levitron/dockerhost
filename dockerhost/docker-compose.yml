@@ -1,0 +1,182 @@
+version: '3.5'
+
+services:
+#  ingress:
+#    image: jwilder/nginx-proxy
+#    restart: always
+#    networks:
+#      - dockerhost
+#    ports:
+#      - "80:80"
+#    volumes:
+#      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  portainer:
+    image: portainer/portainer:latest
+    restart: always
+    environment:
+      - VIRTUAL_HOST=portainer.4jp.de
+#    networks:
+#      - dockerhost
+#      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+#  pihole:
+#    container_name: pihole
+#    image: pihole/pihole:latest
+##    networks:
+##      - dockerhost
+##      - nginx-proxy
+#    ports:
+#      - "53:53/tcp"
+#      - "53:53/udp"
+#      - "67:67/udp"
+#      - "8080:80/tcp"
+#    environment:
+#      ServerIP: 192.168.178.125
+#      TZ: 'Europe/Berlin'
+#      VIRTUAL_HOST: pihole.4jp.de
+#      WEBPASSWORD: 'jpa20915'
+#    # Volumes store your data between container upgrades
+#    volumes:
+#      - './etc-pihole/:/etc/pihole/'
+#      - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+#    dns:
+#      - 127.0.0.1
+#      - 1.1.1.1
+#    # Recommended but not required (DHCP needs NET_ADMIN)
+#    #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+#    cap_add:
+#      - NET_ADMIN
+#    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    volumes:
+      - /etc/prometheus/prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    environment:
+      VIRTUAL_HOST: prometheus.4jp.de
+    ports:
+      - 9090:9090
+    links:
+      - cadvisor:cadvisor
+      - alertmanager:alertmanager
+    depends_on:
+      - cadvisor
+ #   networks:
+#      - dockerhost
+    restart: always
+  #    deploy:
+  #      placement:
+  #        constraints:
+  #          - node.hostname == ${HOSTNAME}
+
+  alertmanager:
+    image: prom/alertmanager
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    ports:
+      - 9093:9093
+    volumes:
+      - /var/prometheus/alertmanager/:/etc/alertmanager/
+#    networks:
+#      - dockerhost
+    environment:
+      VIRTUAL_HOST: alertmanager.4jp.de
+    restart: always
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+  #    deploy:
+  #      placement:
+  #        constraints:
+  #          - node.hostname == ${HOSTNAME}
+  cadvisor:
+    image: google/cadvisor
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8090:8080
+    environment:
+      VIRTUAL_HOST: cadvisor.4jp.de
+#    networks:
+#      - dockerhost
+    restart: always
+    deploy:
+      mode: global
+
+  grafana:
+    image: grafana/grafana
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    user: "104"
+    environment:
+      VIRTUAL_HOST: grafana.4jp.de
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - /root/prometheus/grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - /root/prometheus/grafana/config.monitoring
+#    networks:
+#      - dockerhost
+    restart: always
+
+  influxdb:
+    image: influxdb:latest
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    volumes:
+      # Mount for influxdb data directory
+      - /var/influxdb/data:/var/lib/influxdb
+      # Mount for influxdb configuration
+      - ./influxdb/config/:/etc/influxdb/
+ #   networks:
+#      - dockerhost
+    ports:
+      # The API for InfluxDB is served on port 8086
+      - "8086:8086"
+      - "8082:8082"
+      - "8088:8088"
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+#  dockerhost:
+#    name: dockerhost
+
+
+volumes:
+  portainer_data:
+  prometheus_data: {}
+  grafana_data: {}
+
