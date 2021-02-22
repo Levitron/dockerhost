@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  influxdb:
+    image: influxdb:latest
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    volumes:
+      # Mount for influxdb data directory
+      - /opt/{{ service_name }}/data/influx:/var/lib/influxdb
+      # Mount for influxdb configuration
+      - /opt/{{ service_name }}/config/influx:/etc/influxdb/
+    #   networks:
+    #      - dockerhost
+    ports:
+      # The API for InfluxDB is served on port 8086
+      - 8083:8083
+      - 8086:8086
+      - 8088:8088
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.influxdb.rule=Host(`influx.4jp.de`)
+      - traefik.http.routers.influxdb.loadbalancer.server.port=8086
+      - traefik.http.routers.influxdb.entrypoints=https
+      - traefik.http.routers.influxdb.tls.certresolver=letsencrypt
+    networks:
+      - reverse-proxy_default
+
+networks:
+  reverse-proxy_default:
+    external: true

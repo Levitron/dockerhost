@@ -1,0 +1,42 @@
+- name: Create /opt/{{ service_name }}
+  become: yes
+  file:
+    path: /opt/{{ service_name }}
+    state: directory
+
+- name: ensure influx data dir
+  become: yes
+  file:
+    path: /opt/{{ service_name }}/data/influx
+    state: directory
+
+- name: ensure influx config dir
+  become: yes
+  file:
+    path: /opt/{{ service_name }}/config/influx
+    state: directory
+
+- name: Copy infux config file
+  become: yes
+  template:
+    src: '{{ item }}'
+    dest: /opt/{{ service_name }}/config/influx/{{ item }}
+  loop:
+    - influxdb.conf
+  notify: restart {{ service_name }}
+
+- name: ensure chronograf data dir
+  become: yes
+  file:
+    path: /opt/{{ service_name }}/data/chronograf
+    state: directory
+
+- name: Copy docker-compose file
+  become: yes
+  template:
+    src: '{{ item }}'
+    dest: /opt/{{ service_name }}/{{ item }}
+  loop:
+    - docker-compose.yml
+  notify: restart {{ service_name }}
+
