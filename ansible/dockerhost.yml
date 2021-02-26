@@ -1,0 +1,20 @@
+#- import_playbook: basics.yml
+#- import_playbook: zsh.yml
+#- import_playbook: fzf.yml
+#- import_playbook: node-exporter.yml
+#- import_playbook: docker.yml
+#- import_playbook: restic.yml
+#- import_playbook: reverse-proxy.yml
+#- import_playbook: influxdb.yml
+- import_playbook: monitoring.yml
+
+#- hosts: dockerhost
+
+#    - name: download portainer-compose
+#      git:
+#        repo: https://github.com/portainer/portainer-compose.git
+#        dest: portainer-compose
+
+#    - name: ensure portainer is running
+#      docker_compose:
+#        project_src: portainer-compose

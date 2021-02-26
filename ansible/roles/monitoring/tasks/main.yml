@@ -1,0 +1,55 @@
+- name: Create /opt/{{ service_name }}
+  become: yes
+  file:
+    path: /opt/{{ service_name }}
+    state: directory
+
+- name: Copy docker-compose file
+  become: yes
+  template:
+    src: '{{ item }}'
+    dest: /opt/{{ service_name }}/{{ item }}
+  loop:
+    - docker-compose.yml
+  notify: restart {{ service_name }}
+
+- name: ensure monitoring dirs
+  become: yes
+  file:
+    path: /opt/{{ service_name }}/{{ item }}
+    state: directory
+  loop:
+    - config/alertmanager
+    - config/grafana/provisioning/dashboards
+    - config/grafana/provisioning/datasources
+    - config/prometheus
+    - data/grafana
+    - data/prometheus
+
+- name: Copy monitoring config
+  become: true
+  ansible.builtin.copy:
+    decrypt: true
+    src: ./templates/config/
+    dest: /opt/{{ service_name }}/config/
+  notify: restart {{ service_name }}
+
+- name: Ensure files are populated from templates
+  become: true
+  template:
+    src: '{{ item.src }}'
+    dest: '/opt/{{ service_name }}/config/{{ item.path }}'
+  with_filetree: ./templates/config_templates
+  when: item.state == 'file'
+
+- name: Change file ownership, group and permissions
+  become: yes
+  file:
+    path: /opt/{{ service_name }}/{{ item }}/
+    recurse: yes
+    owner: nobody
+    group: nogroup
+    mode: '0775'
+  loop:
+    - config
+    - data

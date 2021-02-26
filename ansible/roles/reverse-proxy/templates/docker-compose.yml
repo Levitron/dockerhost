@@ -1,0 +1,42 @@
+version: "3.3"
+
+services:
+
+  traefik:
+    build: ""
+    #image: "traefik:v2.3"
+    container_name: "traefik"
+    environment:
+        EXEC_PATH: '/update-dns.py'
+
+        # ./update-dns.sh "present" "_acme-challenge.my.example.org." "MsijOYZxqyjGnFGwhjrhfg-Xgbl5r68WPda0J9EgqqI"
+#    command:
+#      - "--log.level=DEBUG"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik.yml:/traefik.yml:ro"
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.http_traefik.rule=Host(`traefik.4jp.de`)"
+      - "traefik.http.routers.http_traefik.entrypoints=http"
+      - "traefik.http.routers.http_traefik.middlewares=https_redirect"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
+      # Omit next two lines to not do wildcard certs:
+      #- traefik.http.routers.traefik-secure.tls.domains[0].main=example.com
+      #- traefik.http.routers.traefik-secure.tls.domains[0].sans=*.example.com
+
+      # Global Redirect to https
+      #- traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)
+      #- traefik.http.routers.http-catchall.entrypoints=http
+      #- traefik.http.routers.http-catchall.middlewares=redirect-to-https
+      #- traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+#networks:
+#  traefik:
+#    name: traefik

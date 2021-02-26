@@ -4,3 +4,4 @@
   src: https://github.com/Levitron/docker-compose-service
 - src: gantsign.oh-my-zsh
 - src: cloudalchemy.node-exporter
+- src: https://github.com/geerlingguy/ansible-role-docker

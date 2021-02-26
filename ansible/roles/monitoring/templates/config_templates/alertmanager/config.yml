@@ -1,0 +1,11 @@
+ route:
+     receiver: 'pushover'
+
+ receivers:
+   - name: 'pushover'
+     pushover_configs:
+      - token: {{ pushover.token }}
+        user_key: {{ pushover.user_key }}
+        send_resolved: true
+        url: https://prometheus.4jp.de/alerts
+

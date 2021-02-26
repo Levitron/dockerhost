@@ -1,0 +1,45 @@
+groups:
+- name: service-status
+  rules:
+  - alert: ServiceDown
+    expr: probe_success{job="blackbox"} == 0
+    for: 100s
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 100 seconds."
+  - alert: ServiceDownSlow
+    expr: probe_success{job="blackbox-slow"} == 0
+    for: 900s
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 900 seconds."
+  - alert: SSLCertExpiringSoon
+    expr: probe_ssl_earliest_cert_expiry{job="blackbox"} - time() < 86400 * 30
+    for: 10m
+  - alert: InternalServerErrors
+    expr: rate(traefik_entrypoint_requests_total{code=~"5..", job="ax41"}[5m]) > 0
+    for: 10s
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} has internal server errors"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has errors for more than 10 seconds."
+  - alert: RunningOutOfDiskSpace
+    expr: >-
+      100 -
+      ((node_filesystem_avail_bytes{instance="nodeexporter.alten.de:80",job="ax41",mountpoint="/",fstype!="rootfs"} * 100)
+      / node_filesystem_size_bytes{instance="nodeexporter.alten.de:80",job="ax41",mountpoint="/",fstype!="rootfs"}) > 75
+    for: 10m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} is running out of free diskspace"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} runs low on free disk space."
+
+
+
+

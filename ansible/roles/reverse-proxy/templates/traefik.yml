@@ -1,0 +1,59 @@
+log:
+  level: DEBUG
+
+api:
+  dashboard: true
+  insecure: true
+
+# Dynamic Configuration
+http:
+  routers:
+    dashboard:
+      rule: "Host(`traefik.4jp.de`)"
+      service: "api@internal"
+      entrypoints: https
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - auth
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "admin:$apr1$hxILmGqz$/LVKc8nW6tbbavNMBRkpp."
+
+metrics:
+  prometheus:
+    addServicesLabels: true
+
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+  https:
+    address: ":443"
+
+tls:
+  options:
+    default:
+      sniStrict: true
+      minVersion: VersionTLS12
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      #caserver: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      email: support@jaypee.solutions
+      storage: "/letsencrypt/acme.json"
+      dnsChallenge:
+        provider: exec
+        delayBeforeCheck: 60

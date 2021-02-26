@@ -1,15 +1,6 @@
 version: '3.5'
 
 services:
-#  ingress:
-#    image: jwilder/nginx-proxy
-#    restart: always
-#    networks:
-#      - dockerhost
-#    ports:
-#      - "80:80"
-#    volumes:
-#      - /var/run/docker.sock:/tmp/docker.sock:ro
 
   portainer:
     image: portainer/portainer:latest
@@ -148,24 +139,6 @@ services:
 #      - dockerhost
     restart: always
 
-  influxdb:
-    image: influxdb:latest
-    logging:
-      options:
-        max-size: "1g"
-        max-file: "3"
-    volumes:
-      # Mount for influxdb data directory
-      - /var/influxdb/data:/var/lib/influxdb
-      # Mount for influxdb configuration
-      - ./influxdb/config/:/etc/influxdb/
- #   networks:
-#      - dockerhost
-    ports:
-      # The API for InfluxDB is served on port 8086
-      - "8086:8086"
-      - "8082:8082"
-      - "8088:8088"
 
 networks:
   default:

@@ -1,0 +1,29 @@
+---
+
+- hosts: all
+  vars:
+    restic_version: 0.10.0
+    restic_archive: restic_{{restic_version}}_linux_amd64.bz2
+    restic_binary: restic_{{restic_version}}_linux_amd64
+
+  tasks:
+    - name: Check if restic archive exists
+      stat:
+        path: /tmp/{{ restic_archive }}
+      register: stat_result
+
+    - name: download restic binary from GitHub
+      get_url:
+        url: https://github.com/restic/restic/releases/download/v{{ restic_version }}/{{ restic_archive }}
+        dest: /tmp/{{ restic_archive }}
+      when: not stat_result.stat.exists
+
+    - name: extract restic binary
+      command: bzip2 -d /tmp/{{ restic_archive }}
+
+    - name: move restic binary to /usr/bin
+      become: True
+      command: mv  /tmp/{{ restic_binary }} /usr/bin/restic
+
+    - name: set executable permissions
+      file: path=/usr/bin/restic owner=root group=root mode=0700

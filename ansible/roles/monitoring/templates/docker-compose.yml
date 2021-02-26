@@ -1,0 +1,129 @@
+version: "3"
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    logging:
+      options:
+        max-size: "4g"
+        max-file: "30"
+    volumes:
+      - ./config/prometheus/:/etc/prometheus/
+      - ./config/alertmanager/:/etc/alertmanager/
+      - ./data/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monitoring-prometheus.rule=Host(`prometheus.4jp.de`)
+      - traefik.http.routers.monitoring-prometheus.entrypoints=https
+      - traefik.http.routers.monitoring-prometheus.tls.certresolver=letsencrypt
+    ports:
+      - 9090:9090
+    links:
+      - cadvisor:cadvisor
+      - alertmanager:alertmanager
+    depends_on:
+      - cadvisor
+    networks:
+      - reverse-proxy_default
+    restart: always
+
+  alertmanager:
+    image: prom/alertmanager
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    ports:
+      - 9093:9093
+    volumes:
+      - ./config/alertmanager/:/etc/alertmanager/
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monitoring-alertmanager.rule=Host(`alertmanager.4jp.de`)
+      - traefik.http.routers.monitoring-alertmanager.entrypoints=https
+      - traefik.http.routers.monitoring-alertmanager.tls.certresolver=letsencrypt
+    restart: always
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - reverse-proxy_default
+
+  cadvisor:
+    image: google/cadvisor
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8090:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monitoring-cadvisor.rule=Host(`cadvisor.4jp.de`)
+      - traefik.http.routers.monitoring-cadvisor.entrypoints=https
+      - traefik.http.routers.monitoring-cadvisor.tls.certresolver=letsencrypt
+    restart: always
+    deploy:
+      mode: global
+    networks:
+      - reverse-proxy_default
+
+  grafana:
+    image: grafana/grafana
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    user: "65534"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monitoring-grafana.rule=Host(`grafana.4jp.de`)
+      - traefik.http.routers.monitoring-grafana.entrypoints=https
+      - traefik.http.routers.monitoring-grafana.tls.certresolver=letsencrypt
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./config/grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./config/grafana/config.monitoring
+    restart: always
+    networks:
+      - reverse-proxy_default
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "3"
+    user: "65534"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monitoring-blackbox-exporter.rule=Host(`blackbox-exporter.4jp.de`)
+      - traefik.http.routers.monitoring-blackbox-exporter.entrypoints=https
+      - traefik.http.routers.monitoring-blackbox-exporter.tls.certresolver=letsencrypt
+    ports:
+      - 9115:9115
+    volumes:
+      - ./config/blackbox-exporter/:/config
+    restart: always
+    command: --config.file=/config/blackbox.yml
+    networks:
+      - reverse-proxy_default
+
+networks:
+  reverse-proxy_default:
+    external: true

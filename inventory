@@ -1,3 +1,0 @@
-[dockerhost]
-#192.168.178.125      ansible_connection=ssh        ansible_user=root
-192.168.122.242      ansible_connection=ssh        ansible_user=root

@@ -1,0 +1,33 @@
+- name: Create /opt/reverse-proxy
+  become: yes
+  file:
+    path: /opt/reverse-proxy
+    state: directory
+
+- name: Copy docker-compose file
+  become: yes
+  template:
+    src: docker-compose.yml
+    dest: /opt/reverse-proxy/docker-compose.yml
+  notify: restart reverse-proxy
+
+- name: Copy reverse proxy config files
+  become: yes
+  template:
+    src: '{{ item }}'
+    dest: /opt/reverse-proxy/{{ item }}
+  loop:
+    - traefik.yml
+  notify: restart reverse-proxy
+
+- name: Copy schlundtech files
+  become: yes
+  template:
+    src: '{{ item }}'
+    dest: /opt/reverse-proxy/{{ item }}
+  loop:
+    - config.json
+    - Dockerfile
+    - requirements.txt
+    - update-dns.py
+  notify: restart reverse-proxy

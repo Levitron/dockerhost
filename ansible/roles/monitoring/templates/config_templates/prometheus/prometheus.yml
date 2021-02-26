@@ -1,0 +1,94 @@
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 15s # By default, scrape targets every 15 seconds.
+  external_labels:
+      monitor: 'dockerhost'
+
+rule_files:
+  - '/etc/alertmanager/alert.rules'
+
+# alert
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets:
+      - "alertmanager:9093"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+         - targets: ['prometheus:9090']
+
+  - job_name: 'cadvisor'
+    scrape_interval: 5s
+    static_configs:
+         - targets: ['cadvisor:8080']
+
+  - job_name: 'node-exporter'
+    scrape_interval: 5s
+    static_configs:
+         - targets: [
+                     'dockerhost:9100',
+                     'jp-altens-de:9100',
+                     'JPQNAP:9100',
+                     'pihole:9100',
+                     'wireguard:9100',
+                     '192.168.178.125:8080',
+         ]
+
+  - job_name: 'ax41'
+    scrape_interval: 5s
+    scheme: https
+    basic_auth:
+      username: prometheus
+      password:  {{ ax41.password }}
+    static_configs:
+      - targets: [
+          'metrics.alten.de:443',
+          'nodeexporter.alten.de:443',
+      ]
+
+  - job_name: 'blackbox'
+    scrape_interval: 20s
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response.
+    static_configs:
+      - targets:
+          - https://cloud.alten.de   # Target to probe with https.
+          - https://xn--mnnerchor-buchloe-qqb.de
+          - https://jaypee.solutions
+          - https://ninja.jaypee.solutions
+          - https://mail.alten.de
+          - https://obstgut-alten.de
+          - https://www.edv-service-carl.de
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115  # The blackbox exporter's real hostname:port.
+
+  - job_name: 'blackbox-slow'
+    scrape_interval: 300s
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response.
+    static_configs:
+      - targets:
+          - https://seitenzentrale.de
+          - https://www.turnen-blaichach.de
+          - https://www.koeberle-schmid.com
+          - https://zahnarzt-engelmayer.de
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115  # The blackbox exporter's real hostname:port.

@@ -1,0 +1,4 @@
+#!/bin/bash
+# shellcheck shell=bash
+
+ansible-galaxy install -r ansible/requirements.yml --force

@@ -1,0 +1,6 @@
+---
+dependencies:
+  - role: docker-compose-service
+    docker_compose_service_name: '{{ service_name }}'
+    docker_compose_service_basedir: /opt/{{ service_name }}
+    docker_compose_service_respawn: yes

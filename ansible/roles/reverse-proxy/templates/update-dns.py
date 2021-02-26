@@ -156,10 +156,10 @@ class UpdateDns:
 
 if __name__ == '__main__':
     update_dns = UpdateDns()
-    if update_dns.args.command is 'timeout':
+    if update_dns.args.command == 'timeout':
         print({"timeout": 500, "interval": 30})
-    elif update_dns.args.command is 'present':
+    elif update_dns.args.command == 'present':
         update_dns.send_update_xml()
-    elif update_dns.args.command is 'present':
+    elif update_dns.args.command == 'present':
         update_dns.send_cleanup_xml()
     sys.exit()

@@ -1,0 +1,52 @@
+---
+
+- hosts: all
+  vars:
+    # Default theme
+    oh_my_zsh_theme: agnoster
+
+    # Default plugins
+    oh_my_zsh_plugins:
+      - git
+      - colorize
+
+    # User configuration
+    # Important: oh-my-zsh is installed per user so you need to specify the users to install it for.
+    users:
+      - username: root
+        oh_my_zsh:
+          theme: agnoster
+          plugins:
+            - git
+            - colorize
+
+  roles:
+    #- role: levitron.zsh
+    - role: gantsign.oh-my-zsh
+      users:
+        - username: root
+          oh_my_zsh:
+            plugins:
+              - git
+              - zsh-autosuggestions
+              - zsh-completions
+              - zsh-syntax-highlighting
+
+  tasks:
+    - name: ensure oh-my-zsh plugins
+      become: true
+      git:
+        repo: https://github.com/zsh-users/zsh-autosuggestions
+        dest: /root/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+
+    - name: ensure oh-my-zsh plugins
+      become: true
+      git:
+        repo: https://github.com/zsh-users/zsh-completions
+        dest: /root/.oh-my-zsh/custom/plugins/zsh-completions
+
+    - name: ensure oh-my-zsh plugins
+      become: true
+      git:
+        repo: https://github.com/zsh-users/zsh-syntax-highlighting
+        dest: /root/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting

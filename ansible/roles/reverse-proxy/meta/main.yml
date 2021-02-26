@@ -1,0 +1,6 @@
+---
+dependencies:
+  - role: docker-compose-service
+    docker_compose_service_name: reverse-proxy
+    docker_compose_service_basedir: /opt/reverse-proxy
+    docker_compose_service_respawn: yes

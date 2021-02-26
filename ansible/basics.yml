@@ -1,0 +1,33 @@
+---
+
+- hosts: all
+
+  tasks:
+    - name: ensure basic packages
+      become: true
+      apt:
+        name:
+          - bzip2
+          - curl
+          - docker.io
+          - docker-compose
+          - git
+          - htop
+          - iptraf
+          - iotop
+          - iftop
+          - lvm2
+          - screen
+          - tar
+          - unzip
+          - wget
+        state: latest
+
+    - name: ensure deinstalled DHCP and DNS
+      become: true
+      apt:
+        name:
+          - dhcp-server
+          - bind
+          - dnsmasq
+        state: absent

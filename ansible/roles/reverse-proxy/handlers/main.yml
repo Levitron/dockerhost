@@ -1,0 +1,12 @@
+---
+- name: restart reverse-proxy
+  become: yes
+  service:
+    name: reverse-proxy
+    state: restarted
+
+- name: reload traefik
+  become: yes
+  service:
+    name: reverse-proxy
+    state: reloaded
