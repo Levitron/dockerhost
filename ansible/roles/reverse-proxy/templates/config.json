@@ -1,0 +1,4 @@
+{
+    "password": "{{ schlundtech.password }}",
+    "username": "{{ schlundtech.user }}"
+}
