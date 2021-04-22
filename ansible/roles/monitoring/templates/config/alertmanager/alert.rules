@@ -21,7 +21,7 @@ groups:
     expr: probe_ssl_earliest_cert_expiry{job="blackbox"} - time() < 86400 * 20
     for: 10m
   - alert: InternalServerErrors
-    expr: rate(traefik_entrypoint_requests_total{code=~"5..", job="ax41"}[5m]) > 0
+    expr: rate(traefik_entrypoint_requests_total{code=~"5..", job="ax41"}[5m]) > 0.1
     for: 10s
     labels:
       severity: page
