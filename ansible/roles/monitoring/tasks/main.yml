@@ -41,6 +41,7 @@
     dest: '/opt/{{ service_name }}/config/{{ item.path }}'
   with_filetree: ./templates/config_templates
   when: item.state == 'file'
+  notify: restart {{ service_name }}
 
 - name: Change file ownership, group and permissions
   become: yes
