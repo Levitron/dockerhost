@@ -75,7 +75,7 @@ scrape_configs:
         replacement: blackbox-exporter:9115  # The blackbox exporter's real hostname:port.
 
   - job_name: 'blackbox-slow'
-    scrape_interval: 300s
+    scrape_interval: 600s
     metrics_path: /probe
     params:
       module: [http_2xx]  # Look for a HTTP 200 response.
