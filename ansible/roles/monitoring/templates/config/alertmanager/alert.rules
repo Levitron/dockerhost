@@ -18,7 +18,7 @@ groups:
       summary: "Instance {{ $labels.instance }} down"
       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 900 seconds."
   - alert: SSLCertExpiringSoon
-    expr: probe_ssl_earliest_cert_expiry{job="blackbox"} - time() < 86400 * 30
+    expr: probe_ssl_earliest_cert_expiry{job="blackbox"} - time() < 86400 * 20
     for: 10m
   - alert: InternalServerErrors
     expr: rate(traefik_entrypoint_requests_total{code=~"5..", job="ax41"}[5m]) > 0
