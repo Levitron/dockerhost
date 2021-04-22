@@ -11,7 +11,7 @@ groups:
       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 100 seconds."
   - alert: ServiceDownSlow
     expr: probe_success{job="blackbox-slow"} == 0
-    for: 900s
+    for: 1800s
     labels:
       severity: page
     annotations:
