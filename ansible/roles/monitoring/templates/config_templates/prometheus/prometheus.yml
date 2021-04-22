@@ -60,12 +60,16 @@ scrape_configs:
     static_configs:
       - targets:
           - https://cloud.alten.de   # Target to probe with https.
-          - https://xn--mnnerchor-buchloe-qqb.de
+          - https://edv-service-carl.de
           - https://jaypee.solutions
-          - https://ninja.jaypee.solutions
           - https://mail.alten.de
+          - https://ninja.jaypee.solutions
           - https://obstgut-alten.de
+          - https://tsv1862blaichach.de
+          - https://turnen-blaichach.de
           - https://www.edv-service-carl.de
+          - https://www.turnen-blaichach.de
+          - https://xn--mnnerchor-buchloe-qqb.de
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -82,7 +86,6 @@ scrape_configs:
     static_configs:
       - targets:
           - https://seitenzentrale.de
-          - https://www.turnen-blaichach.de
           - https://www.koeberle-schmid.com
           - https://zahnarzt-engelmayer.de
     relabel_configs:
