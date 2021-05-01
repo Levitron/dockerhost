@@ -39,6 +39,14 @@ groups:
     annotations:
       summary: "Instance {{ $labels.instance }} is running out of free diskspace"
       description: "{{ $labels.instance }} of job {{ $labels.job }} runs low on free disk space."
+  - alert: CoffeeCrisisLowWaterLevel
+    expr: water_level < 20
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "BZ10 is running low on water!!!"
+      description: "Give her some water or your won't get a coffee from me!"
 
 
 
