@@ -101,3 +101,9 @@ scrape_configs:
     scrape_interval: 30s
     static_configs:
          - targets: ['192.168.178.124:9303']
+
+  - job_name: 'shelly'
+    scrape_interval: 10s
+    metrics_path: /status
+    static_configs:
+         - targets: ['192.168.178.21', '192.168.178.118']
