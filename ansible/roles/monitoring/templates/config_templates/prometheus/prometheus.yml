@@ -64,7 +64,6 @@ scrape_configs:
           - https://edv-service-carl.de
           - https://jaypee.solutions
           - https://mail.alten.de
-          - https://ninja.jaypee.solutions
           - https://obstgut-alten.de
           - https://tsv1862blaichach.de
           - https://turnen-blaichach.de
