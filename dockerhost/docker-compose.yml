@@ -44,7 +44,7 @@ services:
 #    restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus:v2.1.0
+    image: prom/prometheus:v2.28.1
     logging:
       options:
         max-size: "1g"
