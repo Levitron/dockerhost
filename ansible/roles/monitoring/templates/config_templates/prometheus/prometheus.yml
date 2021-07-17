@@ -103,3 +103,10 @@ scrape_configs:
     static_configs:
          - targets: ['192.168.178.124:9303']
 
+  - job_name: 'watchtower'
+    scrape_interval: 5s
+    metrics_path: /v1/metrics
+    bearer_token: TOP_SECRET
+    static_configs:
+      - targets:
+        - 'watchtower:8080'

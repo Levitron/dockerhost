@@ -1,0 +1,24 @@
+- name: Create /opt/{{ service_name }}
+  become: yes
+  file:
+    path: /opt/{{ service_name }}
+    state: directory
+
+- name: ensure {{ service_name }} directories
+  become: yes
+  file:
+    path: /opt/{{ service_name }}/{{ item }}
+    state: directory
+  loop:
+    - config
+    - data/postgresql
+
+- name: Copy docker-compose file
+  become: yes
+  template:
+    src: '{{ item }}'
+    dest: /opt/{{ service_name }}/{{ item }}
+  loop:
+    - docker-compose.yml
+  notify: restart {{ service_name }}
+
