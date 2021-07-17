@@ -1,4 +1,4 @@
-FROM traefik:v2.3
+FROM traefik:v2.5
 
 RUN apk add py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make libxml2-dev libxslt-dev
 COPY ./requirements.txt /tmp/requirements.txt
