@@ -64,7 +64,9 @@ services:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/snap/docker/common/var-lib-docker:/var/lib/docker:ro
+    command:
+      - privileged=true
     ports:
       - 8090:8080
     labels:
@@ -73,8 +75,6 @@ services:
       - traefik.http.routers.monitoring-cadvisor.entrypoints=https
       - traefik.http.routers.monitoring-cadvisor.tls.certresolver=letsencrypt
     restart: always
-    deploy:
-      mode: global
     networks:
       - reverse-proxy_default
 

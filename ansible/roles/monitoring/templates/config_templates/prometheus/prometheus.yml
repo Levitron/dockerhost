@@ -51,6 +51,8 @@ scrape_configs:
       - targets: [
           'metrics.alten.de:443',
           'nodeexporter.alten.de:443',
+          'docker-metrics.alten.de:443',
+          'cadvisor.alten.de:443',
       ]
 
   - job_name: 'blackbox'
