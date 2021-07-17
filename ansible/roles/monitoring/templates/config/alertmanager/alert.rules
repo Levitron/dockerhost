@@ -52,8 +52,8 @@ groups:
     labels:
       severity: page
     annotations:
-      summary: "BZ10 is running low on water!!!"
-      description: "Give her some water or your won't get a coffee from her!"
+      summary: "Bezzera: I'm dieing of thirst!!!"
+      description: "Give me some water or your won't get a coffee from me!"
 
 
 
